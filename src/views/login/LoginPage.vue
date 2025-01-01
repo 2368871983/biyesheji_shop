@@ -23,7 +23,7 @@ const onClickLeft = () => history.back()
           size="large"
           type="tel"
           maxlength="11"
-          label="手机号"
+          label="手机号："
           placeholder="请输入手机号"
         />
 
@@ -33,7 +33,7 @@ const onClickLeft = () => history.back()
           size="large"
           type="text"
           maxlength="4"
-          label="图形验证码"
+          label="图形验证码："
           placeholder="请输入图形验证码"
         >
           <template #right-icon>
@@ -46,7 +46,7 @@ const onClickLeft = () => history.back()
           v-model="test"
           center
           clearable
-          label="短信验证码"
+          label="短信验证码："
           maxlength="5"
           placeholder="请输入短信验证码"
         >
