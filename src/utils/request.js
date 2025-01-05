@@ -3,6 +3,7 @@
 import axios from 'axios'
 import { useUserStore } from '@/stores'
 
+
 // 创建一个新的axios实例
 const instance = axios.create({
   baseURL: 'http://smart-shop.itheima.net/index.php?s=/api',
@@ -11,6 +12,7 @@ const instance = axios.create({
 
 // 添加请求拦截器
 instance.interceptors.request.use(
+
   (config) => {
     const userStore = setTimeout(() => {
       useUserStore()
@@ -19,6 +21,13 @@ instance.interceptors.request.use(
       config.headers['Access-Token'] = userStore.token
     }
     config.headers['platform'] = 'H5'
+    // eslint-disable-next-line no-undef
+    showLoadingToast({
+      message: '加载中...',
+      forbidClick: true,
+      loadingType: 'spinner',
+      duration: 0,
+    })
     return config
   },
   (error) => {
@@ -31,9 +40,12 @@ instance.interceptors.request.use(
 // 添加响应拦截器
 instance.interceptors.response.use(
   (res) => {
+    // 在请求失败时隐藏加载提示
+
+    // eslint-disable-next-line no-undef
+    closeToast()
     // 对响应数据做点什么
     if (res.data.status === 200) {
-
       return res.data
     }
     // eslint-disable-next-line no-undef
