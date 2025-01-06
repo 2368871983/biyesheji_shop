@@ -31,7 +31,8 @@ const router = createRouter({
     { path: '/myorder', component: () => import('@/views/myorder/MyOrderPage.vue') },
     { path: '/pay', component: () => import('@/views/pay/PayPage.vue') },
     { path: '/search', component: () => import('@/views/search/SearchPage.vue') },
-    { path: '/searchlist', component: () => import('@/views/search/SearchListPage.vue') }
+    { path: '/searchlist', component: () => import('@/views/search/SearchListPage.vue') },
+    { path: '/service', component: () => import('@/views/service/ServicePage.vue') }
 
   ]
 })
