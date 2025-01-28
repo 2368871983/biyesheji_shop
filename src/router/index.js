@@ -5,10 +5,12 @@ const router = createRouter({
   routes: [
 
     { path: '/login', component: () => import('@/views/login/LoginPage.vue') },
+
     {
       path: '/', component: () => import('@/views/layout/LayoutPage.vue'),
       redirect: '/home',
       children: [
+
         {
           path: '/category',
           component: () => import('@/views/layout/CategoryPage.vue')
@@ -32,8 +34,7 @@ const router = createRouter({
     { path: '/pay', component: () => import('@/views/pay/PayPage.vue') },
     { path: '/search', component: () => import('@/views/search/SearchPage.vue') },
     { path: '/searchlist', component: () => import('@/views/search/SearchListPage.vue') },
-    { path: '/service', component: () => import('@/views/service/ServicePage.vue') }
-
+    { path: '/service', component: () => import('@/views/service/ServicePage.vue') },
   ]
 })
 
