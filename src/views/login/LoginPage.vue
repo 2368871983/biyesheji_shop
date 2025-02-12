@@ -97,7 +97,6 @@ const getLogin = async () => {
   })
   const userStore = useUserStore()
   userStore.setToken(res.data.token)
-  console.log(userStore.token)
 
   // eslint-disable-next-line no-undef
   showToast({ duration: 800, message: '登录成功！' })

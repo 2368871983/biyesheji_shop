@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
+import { useUserStore } from '@/stores/index'
+// 配路由
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -38,4 +39,21 @@ const router = createRouter({
   ]
 })
 
+// 导航守卫
+const authUrls = ['/myorder', '/pay', '/user']
+router.beforeEach((to) => {
+  // 获取token
+  const useStore = useUserStore()
+  const token = useStore.token
+  // 判断是否权限页面
+  if (!authUrls.includes(to.path)) {
+    return
+  }
+  else {
+
+    if (!token && to.path !== '/login') {
+      return '/login'
+    }
+  }
+})
 export default router

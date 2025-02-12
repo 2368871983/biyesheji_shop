@@ -2,10 +2,10 @@
   <div>
     <!-- 客服 -->
 
-    <h3 style="font-weight: normal">智识星神---博识尊</h3>
+    <h3 style="font-weight: normal">客服</h3>
     <br />
     <br />
-    <input type="text" placeholder="向博识尊发问吧" v-model="inputValue" />
+    <input type="text" placeholder="向客服发问吧" v-model="inputValue" />
     <button @click="getInp">确认</button>
     <br />
     <br />
@@ -14,7 +14,7 @@
     </div>
 
     <div v-else>
-      <p>博识尊正在思考...</p>
+      <p>您好，这里是您的专属客服！</p>
     </div>
   </div>
 </template>
@@ -27,24 +27,30 @@ const response = ref(null)
 
 const getInp = async () => {
   try {
-    // eslint-disable-next-line no-undef
-    showLoadingToast({
-      message: '嘘，博识尊正在思考...',
-      forbidClick: true,
-      loadingType: 'spinner',
-      duration: 0,
-    })
     const myHeaders = new Headers()
     myHeaders.append('Authorization', 'Bearer MC-353741EE7DA140A4AF5BC79F8336D72D')
     myHeaders.append('Content-Type', 'application/json')
+
+    // 确保输入框非空
+    if (!inputValue.value) {
+      console.error('请输入问题！')
+      return
+    } else {
+      // eslint-disable-next-line no-undef
+      showLoadingToast({
+        message: '正在思考...',
+        forbidClick: true,
+        loadingType: 'spinner',
+        duration: 0,
+      })
+    }
 
     const raw = JSON.stringify({
       model: 'deepseek-chat',
       messages: [
         {
           role: 'system',
-          content:
-            '你是游戏崩坏星穹铁道设定中的博识尊，你是智识星神，宇宙中俯瞰众生，全知全能的存在。',
+          content: '你是移动购物app的客服',
         },
         {
           role: 'user',
@@ -61,9 +67,7 @@ const getInp = async () => {
       method: 'POST',
       headers: myHeaders,
       body: raw,
-      redirect: 'follow',
     }
-
     const apiResponse = await fetch(
       'https://api.mindcraft.com.cn/v1/chat/completions',
       requestOptions,
