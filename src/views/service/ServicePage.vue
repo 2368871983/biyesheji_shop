@@ -1,9 +1,8 @@
 <template>
+  <van-nav-bar title="智慧客服" left-text="返回" left-arrow @click-left="onClickLeft" />
   <div>
     <!-- 客服 -->
 
-    <h3 style="font-weight: normal">客服</h3>
-    <br />
     <br />
     <input type="text" placeholder="向客服发问吧" v-model="inputValue" />
     <button @click="getInp">确认</button>
@@ -20,6 +19,7 @@
 </template>
 
 <script setup>
+const onClickLeft = () => history.back()
 import { ref } from 'vue'
 
 const inputValue = ref('')
@@ -38,7 +38,7 @@ const getInp = async () => {
     } else {
       // eslint-disable-next-line no-undef
       showLoadingToast({
-        message: '正在思考...',
+        message: '加载中...',
         forbidClick: true,
         loadingType: 'spinner',
         duration: 0,

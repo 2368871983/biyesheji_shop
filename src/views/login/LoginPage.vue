@@ -213,10 +213,10 @@ const getLogin = async () => {
   width: 40%;
   height: 42px;
   margin-top: 50px;
-  background: linear-gradient(90deg, #7bb7ec, #1989fa);
+  background: linear-gradient(90deg, #7ec2fd, #087ef5);
   color: #fff;
   border-radius: 39px;
-  box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.1);
+
   letter-spacing: 2px;
   display: flex;
   justify-content: center;

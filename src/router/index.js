@@ -40,7 +40,7 @@ const router = createRouter({
 })
 
 // 导航守卫
-const authUrls = ['/myorder', '/pay', '/user']
+const authUrls = ['/myorder', '/pay', '/user', '/service']
 router.beforeEach((to) => {
   // 获取token
   const useStore = useUserStore()

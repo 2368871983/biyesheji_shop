@@ -16,8 +16,14 @@ import { Dialog } from 'vant';
 import { Loading } from 'vant';
 // 下拉刷新
 import { PullRefresh } from 'vant';
-
+// 浮动气泡
 import { FloatingBubble } from 'vant';
+// 导航栏
+import { NavBar } from 'vant';
+// 搜索框
+import { Search } from 'vant';
+// 宫格
+import { GridItem } from 'vant';
 const app = createApp(App)
 app.use(pinia)
 app.use(router)
@@ -30,3 +36,6 @@ app.use(Dialog);
 app.use(Loading);
 app.use(PullRefresh);
 app.use(FloatingBubble)
+app.use(Search);
+app.use(NavBar);
+app.use(GridItem);
