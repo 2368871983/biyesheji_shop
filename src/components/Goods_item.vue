@@ -3,17 +3,15 @@
 const props = defineProps({
   item: {
     type: Object,
-    required: true,
+    default: () => {
+      return {}
+    },
   },
 })
 </script>
 
 <template>
-  <div
-    v-if="item.goods_name"
-    class="goods-item"
-    @click="$router.push(`/prodetail/${item.goods_id}`)"
-  >
+  <div v-if="item.goods_id" class="goods-item" @click="$router.push(`/prodetail/${item.goods_id}`)">
     <div class="left">
       <img :src="item.goods_image" alt="" />
     </div>

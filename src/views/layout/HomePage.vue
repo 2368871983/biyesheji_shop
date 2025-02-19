@@ -14,19 +14,15 @@ onMounted(async () => {
 })
 const loadData = async () => {
   isLoading.value = true
-  try {
-    const {
-      data: { pageData },
-    } = await getHomeData(page.value)
-    bannerList.value = pageData.items[1].data
-    navList.value = pageData.items[3].data
-    goodsList.value = [...goodsList.value, ...pageData.items[6].data]
-    page.value++
-  } catch (error) {
-    console.error('加载数据失败:', error)
-  } finally {
-    isLoading.value = false
-  }
+
+  const {
+    data: { pageData },
+  } = await getHomeData(page.value)
+  bannerList.value = pageData.items[1].data
+  navList.value = pageData.items[3].data
+  goodsList.value = [...goodsList.value, ...pageData.items[6].data]
+
+  isLoading.value = false
 }
 </script>
 
@@ -99,7 +95,7 @@ const loadData = async () => {
 
 // 商品样式
 .goods-list {
-  background: linear-gradient(180deg, #efb4b0, #fff3f3);
+  background: linear-gradient(180deg, #ffd8d6, #fff3f3);
   margin-bottom: 40px;
 }
 </style>

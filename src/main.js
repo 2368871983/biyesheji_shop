@@ -24,11 +24,12 @@ import { NavBar } from 'vant';
 import { Search } from 'vant';
 // 宫格
 import { GridItem } from 'vant';
+import { ImagePreview } from 'vant';
 const app = createApp(App)
 app.use(pinia)
 app.use(router)
 app.mount('#app')
-
+app.use(ImagePreview);
 app.use(Form);
 app.use(Field);
 app.use(CellGroup);
