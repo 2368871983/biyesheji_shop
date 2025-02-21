@@ -46,7 +46,7 @@ const getInp = async () => {
     }
 
     const raw = JSON.stringify({
-      model: 'qwen-plus-latest',
+      model: 'deepseek-reasoner',
       messages: [
         {
           role: 'system',

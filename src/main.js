@@ -25,6 +25,8 @@ import { Search } from 'vant';
 // 宫格
 import { GridItem } from 'vant';
 import { ImagePreview } from 'vant';
+import { Rate } from 'vant';
+import { ActionSheet } from 'vant';
 const app = createApp(App)
 app.use(pinia)
 app.use(router)
@@ -40,3 +42,5 @@ app.use(FloatingBubble)
 app.use(Search);
 app.use(NavBar);
 app.use(GridItem);
+app.use(Rate);
+app.use(ActionSheet);

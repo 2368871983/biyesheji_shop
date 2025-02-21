@@ -7,7 +7,12 @@ const goods_name = ref('')
 const goods_price_max = ref('')
 const goods_sales = ref('')
 const line_price_max = ref('')
-
+const goods_price_min = ref('')
+const content = ref('')
+const commentList = ref([])
+const commenttotal = ref(0)
+const score = ref(0)
+const stock = ref(0)
 // 轮播
 const onChange = (index) => {
   current.value = index
@@ -24,12 +29,15 @@ const showPic = (index) =>
 import { onMounted } from 'vue'
 import { getProdetailData } from '@/api/prodetail'
 import { useRoute } from 'vue-router'
+import { getProComment } from '@/api/prodetail'
+import defaultImg from '@/assets/default-avatar.png'
 // 获取路由对象
 const route = useRoute()
 // 从路由参数中获取 goodsId
 const goodsId = ref(route.params.id)
 onMounted(async () => {
   await loadData(goodsId.value)
+  await loadProComment(goodsId.value)
 })
 const loadData = async (id) => {
   const {
@@ -39,8 +47,32 @@ const loadData = async (id) => {
   images.value = detail.goods_images.map((item) => item.external_url)
   goods_name.value = detail.goods_name
   goods_price_max.value = detail.goods_price_max
+  goods_price_min.value = detail.goods_price_min
   line_price_max.value = detail.line_price_max
   goods_sales.value = detail.goods_sales
+  content.value = detail.content
+
+  stock.value = detail.stock_total
+  console.log(stock.value)
+}
+const loadProComment = async (id) => {
+  const {
+    data: { list, total },
+  } = await getProComment(id)
+
+  commenttotal.value = total
+  commentList.value = list
+  score.value = list.map((item) => ({
+    ...item,
+    score: item.score / 2,
+  }))
+}
+// 购物车弹窗
+const showmode = ref('')
+const show = ref(false)
+const showPopup = (mode) => {
+  show.value = true
+  showmode.value = mode
 }
 </script>
 <template>
@@ -61,8 +93,8 @@ const loadData = async (id) => {
     <div class="info">
       <div class="title">
         <div class="price">
-          <span class="now">￥{{ goods_price_max }}</span>
-          <span class="oldprice">￥{{ line_price_max }}</span>
+          <span class="now">￥{{ goods_price_min }}</span>
+          <span class="oldprice">￥{{ goods_price_max }}</span>
         </div>
         <div class="sellcount">已售{{ goods_sales }}件</div>
       </div>
@@ -84,45 +116,63 @@ const loadData = async (id) => {
     <!-- 商品评价 -->
     <div class="comment">
       <div class="comment-title">
-        <div class="left">商品评价 (5条)</div>
+        <div class="left">商品评价 ({{ commenttotal }}条)</div>
         <div class="right">查看更多 <van-icon name="arrow" /></div>
       </div>
       <div class="comment-list">
-        <div class="comment-item" v-for="item in 3" :key="item">
+        <div class="comment-item" v-for="item in commentList" :key="item.comment_id">
           <div class="top">
-            <img
-              src="http://cba.itlike.com/public/uploads/10001/20230321/a0db9adb2e666a65bc8dd133fbed7834.png"
-              alt=""
+            <img :src="item.user.avatar_url || defaultImg" alt="" />
+            <div class="name">{{ item.user.nick_name }}</div>
+            <van-rate
+              v-model="item.score"
+              :size="16"
+              color="#ffd21e"
+              void-icon="star"
+              void-color="#eee"
             />
-            <div class="name">神雕大侠</div>
-            <van-rate :size="16" :value="5" color="#ffd21e" void-icon="star" void-color="#eee" />
           </div>
-          <div class="content">质量很不错 挺喜欢的</div>
-          <div class="time">2023-03-21 15:01:35</div>
+          <div class="content">{{ item.content }}</div>
+          <div class="time">{{ item.create_time }}</div>
         </div>
       </div>
     </div>
 
     <!-- 商品描述 -->
-    <div class="desc">
-      <img
-        src="https://uimgproxy.suning.cn/uimg1/sop/commodity/kHgx21fZMWwqirkMhawkAw.jpg"
-        alt=""
-      />
-      <img
-        src="https://uimgproxy.suning.cn/uimg1/sop/commodity/0rRMmncfF0kGjuK5cvLolg.jpg"
-        alt=""
-      />
-      <img
-        src="https://uimgproxy.suning.cn/uimg1/sop/commodity/2P04A4Jn0HKxbKYSHc17kw.jpg"
-        alt=""
-      />
-      <img
-        src="https://uimgproxy.suning.cn/uimg1/sop/commodity/MT4k-mPd0veQXWPPO5yTIw.jpg"
-        alt=""
-      />
-    </div>
+    <div class="desc" v-html="content"></div>
+    <!-- 购物车弹窗 -->
+    <van-action-sheet v-model:show="show" title="加入购物车">
+      <div class="content">
+        <div class="product">
+          <div class="left">
+            <img src="@/assets/categood.png" alt="" />
+          </div>
+          <div class="right">
+            <div class="price">
+              <span class="rmb">¥</span>
+              <span class="num">200</span>
+            </div>
+            <div class="count">
+              <span>库存1000</span>
+            </div>
+          </div>
+        </div>
+        <div class="count-box">
+          <span>数量:</span>
+          组件占位
+        </div>
+        <div class="btn">
+          <div class="showbtn" v-if="stock > 0">
+            <div class="cartbtn" v-if="showmode == 'cart'">加入购物车</div>
+            <div class="buybtn" v-if="showmode == 'buy'">立即购买</div>
+          </div>
 
+          <div class="hidebtn" v-else>
+            <div>该商品已售罄</div>
+          </div>
+        </div>
+      </div>
+    </van-action-sheet>
     <!-- 底部 -->
     <div class="footer">
       <div class="icon-home">
@@ -133,8 +183,8 @@ const loadData = async (id) => {
         <van-icon name="shopping-cart-o" />
         <span>购物车</span>
       </div>
-      <div class="btn-add">加入购物车</div>
-      <div class="btn-buy">立刻购买</div>
+      <div class="btn-add" @click="showPopup('cart')">加入购物车</div>
+      <div class="btn-buy" @click="showPopup('buy')">立刻购买</div>
     </div>
   </div>
 </template>
@@ -290,5 +340,66 @@ const loadData = async (id) => {
 
 .tips {
   padding: 10px;
+}
+.product {
+  display: flex;
+  .left {
+    padding: 10px;
+    .img {
+      width: 90px;
+      height: 90px;
+    }
+  }
+  .right {
+    flex: 1;
+    padding: 10px;
+    .rmb {
+      color: #fe560a;
+    }
+    .num {
+      color: #fe560a;
+      font-size: 24px;
+      margin: 5px;
+    }
+    .count {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      color: grey;
+    }
+  }
+}
+.count-box {
+  display: flex;
+  margin: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+.showbtn {
+  height: 40px;
+  line-height: 40px;
+  margin: 20px;
+
+  text-align: center;
+  color: rgb(255, 255, 255);
+  .cartbtn {
+    background-color: rgb(255, 148, 2);
+    border-radius: 20px;
+  }
+  .buybtn {
+    background-color: #fe5630;
+    border-radius: 20px;
+  }
+}
+
+.hidebtn {
+  height: 40px;
+  line-height: 40px;
+  margin: 20px;
+  border-radius: 20px;
+  text-align: center;
+  color: rgb(255, 255, 255);
+  background-color: rgb(167, 167, 167);
 }
 </style>
