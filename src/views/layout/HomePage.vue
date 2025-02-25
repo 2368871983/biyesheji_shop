@@ -27,37 +27,39 @@ const loadData = async () => {
 </script>
 
 <template>
-  <van-nav-bar title="购物商城" />
+  <div>
+    <van-nav-bar class="nav-bar" title="购物商城" />
 
-  <van-search @click="$router.push('/search')" shape="round" placeholder="请输入搜索关键词" />
+    <van-search @click="$router.push('/search')" shape="round" placeholder="请输入搜索关键词" />
 
-  <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-    <van-swipe-item v-for="item in bannerList" :key="item.imgUrl"
-      ><img :src="item.imgUrl" alt=""
-    /></van-swipe-item>
-  </van-swipe>
-  <van-grid column-num="5" icon-size="40">
-    <van-grid-item
-      v-for="item in navList"
-      :key="item.imgUrl"
-      :icon="item.imgUrl"
-      text="新品首发"
-      @click="$router.push('/category')"
-    />
-  </van-grid>
-  <!-- 主会场 -->
-  <div class="main">
-    <img src="@/assets/main.png" alt="" />
-  </div>
-  <!-- 猜你喜欢 -->
-  <div class="guess">
-    <p class="guess-title">—— 猜你喜欢 ——</p>
-
-    <div class="goods-list">
-      <Goods_item v-for="item in goodsList" :key="item.goods_id" :item="item"></Goods_item>
+    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+      <van-swipe-item v-for="item in bannerList" :key="item.imgUrl"
+        ><img :src="item.imgUrl" alt=""
+      /></van-swipe-item>
+    </van-swipe>
+    <van-grid column-num="5" icon-size="40">
+      <van-grid-item
+        v-for="item in navList"
+        :key="item.imgUrl"
+        :icon="item.imgUrl"
+        text="新品首发"
+        @click="$router.push('/category')"
+      />
+    </van-grid>
+    <!-- 主会场 -->
+    <div class="main">
+      <img src="@/assets/main.png" alt="" />
     </div>
-    <!-- 加载提示 -->
-    <div v-if="isLoading">加载中...</div>
+    <!-- 猜你喜欢 -->
+    <div class="guess">
+      <p class="guess-title">— — 猜你喜欢 — —</p>
+
+      <div class="goods-list">
+        <Goods_item v-for="item in goodsList" :key="item.goods_id" :item="item"></Goods_item>
+      </div>
+      <!-- 加载提示 -->
+      <div v-if="isLoading">加载中...</div>
+    </div>
   </div>
 </template>
 
@@ -65,10 +67,16 @@ const loadData = async () => {
 .van-nav-bar {
   background: linear-gradient(180deg, #fcd6d3, #fff3f3);
   z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 .van-search {
-  border-radius: 100px;
-  z-index: 999;
+  z-index: 1;
+  position: fixed;
+  top: 45px;
+  width: 100%;
 
   --van-search-content-background: rgb(244, 242, 242);
 }
@@ -77,6 +85,7 @@ const loadData = async () => {
   color: #fff;
   font-size: 20px;
   text-align: center;
+  margin-top: 100px;
 }
 .my-swipe .van-swipe-item img {
   width: 100%;

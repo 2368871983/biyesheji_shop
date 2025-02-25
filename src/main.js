@@ -23,10 +23,12 @@ import { NavBar } from 'vant';
 // 搜索框
 import { Search } from 'vant';
 // 宫格
+import { Icon } from 'vant';
 import { GridItem } from 'vant';
 import { ImagePreview } from 'vant';
 import { Rate } from 'vant';
 import { ActionSheet } from 'vant';
+import { Barrage } from 'vant';
 const app = createApp(App)
 app.use(pinia)
 app.use(router)
@@ -44,3 +46,5 @@ app.use(NavBar);
 app.use(GridItem);
 app.use(Rate);
 app.use(ActionSheet);
+app.use(Barrage);
+app.use(Icon);

@@ -12,13 +12,24 @@ export const getProdetailData = (id) => {
 }
 
 // 获取商品评价
-export const getProComment = (id) => {
+export const getProComment = (id, limit) => {
   return request({
     url: '/comment/listRows',
     method: 'GET',
     params: {
       goodsId: id,
-      limit: 3
+      limit: limit || 3
+    }
+  })
+}
+// 获取商品保障服务
+
+export const getProService = (id) => {
+  return request({
+    url: '/goods.service/list',
+    method: 'GET',
+    params: {
+      goodsId: id
     }
   })
 }

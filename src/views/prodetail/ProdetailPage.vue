@@ -13,6 +13,10 @@ const commentList = ref([])
 const commenttotal = ref(0)
 const score = ref(0)
 const stock = ref(0)
+const defaultList = ref([])
+const barrage = ref()
+const danmulist = ref([...defaultList.value])
+const proserviceList = ref([])
 // 轮播
 const onChange = (index) => {
   current.value = index
@@ -27,10 +31,11 @@ const showPic = (index) =>
   })
 // 获取商品详情数据
 import { onMounted } from 'vue'
-import { getProdetailData } from '@/api/prodetail'
+import { getProdetailData, getProComment, getProService } from '@/api/prodetail'
 import { useRoute } from 'vue-router'
-import { getProComment } from '@/api/prodetail'
+
 import defaultImg from '@/assets/default-avatar.png'
+
 // 获取路由对象
 const route = useRoute()
 // 从路由参数中获取 goodsId
@@ -38,12 +43,14 @@ const goodsId = ref(route.params.id)
 onMounted(async () => {
   await loadData(goodsId.value)
   await loadProComment(goodsId.value)
+  await loadProService(goodsId.value)
 })
+// 商品数据
 const loadData = async (id) => {
   const {
     data: { detail },
   } = await getProdetailData(id)
-  console.log(detail)
+
   images.value = detail.goods_images.map((item) => item.external_url)
   goods_name.value = detail.goods_name
   goods_price_max.value = detail.goods_price_max
@@ -53,20 +60,44 @@ const loadData = async (id) => {
   content.value = detail.content
 
   stock.value = detail.stock_total
-  console.log(stock.value)
 }
+// 评论数据
 const loadProComment = async (id) => {
   const {
     data: { list, total },
-  } = await getProComment(id)
+  } = await getProComment(id, 5)
 
   commenttotal.value = total
   commentList.value = list
+  // 弹幕
+  defaultList.value = [
+    ...list.map((item, index) => ({
+      id: 100 + index,
+      text: item.content.length > 10 ? item.content.slice(0, 10) + '...' : item.content,
+    })),
+  ]
+  console.log(defaultList.value)
+
+  danmulist.value = [...defaultList.value]
+  console.log(list.value)
+
   score.value = list.map((item) => ({
     ...item,
     score: item.score / 2,
   }))
 }
+
+// 商品保障弹窗
+const loadProService = async (id) => {
+  const { data } = await getProService(id)
+  console.log(data)
+  proserviceList.value = data.list
+}
+const showService = ref(false)
+const showServicePopup = () => {
+  showService.value = true
+}
+
 // 购物车弹窗
 const showmode = ref('')
 const show = ref(false)
@@ -79,112 +110,140 @@ const showPopup = (mode) => {
   <div class="prodetail">
     <van-nav-bar fixed title="商品详情页" left-arrow @click-left="onClickLeft" />
 
-    <van-swipe lazy-render :autoplay="3000" @change="onChange">
-      <van-swipe-item v-for="(image, index) in images" :key="index">
-        <img @click="showPic(current)" :src="image" />
-      </van-swipe-item>
-
-      <template #indicator>
-        <div class="custom-indicator">{{ current + 1 }} / {{ images.length }}</div>
-      </template>
-    </van-swipe>
-
-    <!-- 商品说明 -->
-    <div class="info">
-      <div class="title">
-        <div class="price">
-          <span class="now">￥{{ goods_price_min }}</span>
-          <span class="oldprice">￥{{ goods_price_max }}</span>
-        </div>
-        <div class="sellcount">已售{{ goods_sales }}件</div>
-      </div>
-      <div class="msg text-ellipsis-2">
-        {{ goods_name }}
-      </div>
-
-      <div class="service">
-        <div class="left-words">
-          <span><van-icon name="passed" />七天无理由退货</span>
-          <span><van-icon name="passed" />48小时发货</span>
-        </div>
-        <div class="right-icon">
-          <van-icon name="arrow" />
-        </div>
-      </div>
+    <div class="danmu">
+      <van-barrage rows="5" ref="barrage" v-model="danmulist">
+        <div class="video" delay="300" duration="3000" style="width: 100%; height: 150px"></div>
+      </van-barrage>
     </div>
 
-    <!-- 商品评价 -->
-    <div class="comment">
-      <div class="comment-title">
-        <div class="left">商品评价 ({{ commenttotal }}条)</div>
-        <div class="right">查看更多 <van-icon name="arrow" /></div>
-      </div>
-      <div class="comment-list">
-        <div class="comment-item" v-for="item in commentList" :key="item.comment_id">
-          <div class="top">
-            <img :src="item.user.avatar_url || defaultImg" alt="" />
-            <div class="name">{{ item.user.nick_name }}</div>
-            <van-rate
-              v-model="item.score"
-              :size="16"
-              color="#ffd21e"
-              void-icon="star"
-              void-color="#eee"
-            />
-          </div>
-          <div class="content">{{ item.content }}</div>
-          <div class="time">{{ item.create_time }}</div>
-        </div>
-      </div>
+    <div style="position: relative; z-index: 0">
+      <van-swipe lazy-render :autoplay="3000" @change="onChange">
+        <van-swipe-item v-for="(image, index) in images" :key="index">
+          <img @click="showPic(current)" :src="image" />
+        </van-swipe-item>
+
+        <template #indicator>
+          <div class="custom-indicator">{{ current + 1 }} / {{ images.length }}</div>
+        </template>
+      </van-swipe>
     </div>
 
-    <!-- 商品描述 -->
-    <div class="desc" v-html="content"></div>
-    <!-- 购物车弹窗 -->
-    <van-action-sheet v-model:show="show" title="加入购物车">
-      <div class="content">
-        <div class="product">
-          <div class="left">
-            <img src="@/assets/categood.png" alt="" />
+    <div style="position: relative">
+      <!-- 商品说明 -->
+      <div class="info">
+        <div class="title">
+          <div class="price">
+            <span class="now">￥{{ goods_price_min }}</span>
+            <span class="oldprice">￥{{ goods_price_max }}</span>
           </div>
-          <div class="right">
-            <div class="price">
-              <span class="rmb">¥</span>
-              <span class="num">200</span>
-            </div>
-            <div class="count">
-              <span>库存1000</span>
+          <div class="sellcount">已售{{ goods_sales }}件</div>
+        </div>
+        <div class="msg text-ellipsis-2">
+          {{ goods_name }}
+        </div>
+
+        <div @click="showServicePopup" class="service">
+          <div class="left-words">
+            <span v-for="item in proserviceList" :key="item.service_id"
+              >{{ item.name }}<van-icon name="passed" />
+            </span>
+          </div>
+          <div class="right-icon">
+            <van-icon name="arrow" />
+          </div>
+        </div>
+      </div>
+      <van-action-sheet
+        style="
+          background-image: linear-gradient(to bottom left, #f9db8d 15%, #fff 50%, #f9db8d 85%);
+        "
+        v-model:show="showService"
+        title="服务安心保障"
+      >
+        <div style="display: flex; justify-content: center; align-items: center">
+          <div style="margin: 10px; border-radius: 10px" class="serviceContent">
+            <div v-for="item in proserviceList" :key="item.service_id" class="serviceWords">
+              <van-icon name="award" />"{{ item.summary }}"
             </div>
           </div>
         </div>
-        <div class="count-box">
-          <span>数量:</span>
-          组件占位
-        </div>
-        <div class="btn">
-          <div class="showbtn" v-if="stock > 0">
-            <div class="cartbtn" v-if="showmode == 'cart'">加入购物车</div>
-            <div class="buybtn" v-if="showmode == 'buy'">立即购买</div>
-          </div>
+      </van-action-sheet>
 
-          <div class="hidebtn" v-else>
-            <div>该商品已售罄</div>
+      <!-- 商品评价 -->
+      <div class="comment">
+        <div class="comment-title">
+          <div class="left">商品评价 ({{ commenttotal }}条)</div>
+          <div class="right">查看更多 <van-icon name="arrow" /></div>
+        </div>
+        <div class="comment-list">
+          <div class="comment-item" v-for="item in commentList" :key="item.comment_id">
+            <div class="top">
+              <img :src="item.user.avatar_url || defaultImg" alt="" />
+              <div class="name">{{ item.user.nick_name }}</div>
+              <van-rate
+                v-model="item.score"
+                :size="16"
+                color="#ffd21e"
+                void-icon="star"
+                void-color="#eee"
+              />
+            </div>
+            <div class="content">
+              {{ item.content.length > 10 ? item.content.slice(0, 10) + '......' : item.content }}
+            </div>
+            <div class="time">{{ item.create_time }}</div>
           </div>
         </div>
       </div>
-    </van-action-sheet>
-    <!-- 底部 -->
-    <div class="footer">
-      <div class="icon-home">
-        <van-icon name="wap-home-o" />
-        <span>首页</span>
+
+      <!-- 商品描述 -->
+      <div class="desc" v-html="content"></div>
+      <!-- 购物车弹窗 -->
+      <van-action-sheet v-model:show="show" title="加入购物车">
+        <div class="content">
+          <div class="product">
+            <div class="left">
+              <img src="@/assets/categood.png" alt="" />
+            </div>
+            <div class="right">
+              <div class="price">
+                <span class="rmb">¥</span>
+                <span class="num">{{ goods_price_min }}</span>
+              </div>
+              <div class="count">
+                <span>库存 {{ stock }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="count-box">
+            <span>数量:</span>
+            组件占位
+          </div>
+          <div class="btn">
+            <div class="showbtn" v-if="stock > 0">
+              <div class="cartbtn" v-if="showmode == 'cart'">加入购物车</div>
+              <div class="buybtn" v-if="showmode == 'buy'">立即购买</div>
+            </div>
+
+            <div class="hidebtn" v-else>
+              <div>该商品已售罄</div>
+            </div>
+          </div>
+        </div>
+      </van-action-sheet>
+      <!-- 底部 -->
+      <div class="footer">
+        <div class="icon-home">
+          <van-icon name="wap-home-o" />
+          <span @click="$router.push('/home')">首页</span>
+        </div>
+        <div class="icon-cart">
+          <van-icon name="shopping-cart-o" />
+          <span @click="$router.push('/cart')">购物车</span>
+        </div>
+        <div class="btn-add" @click="showPopup('cart')">加入购物车</div>
+        <div class="btn-buy" @click="showPopup('buy')">立刻购买</div>
       </div>
-      <div class="icon-cart">
-        <van-icon name="shopping-cart-o" />
-        <span>购物车</span>
-      </div>
-      <div class="btn-add" @click="showPopup('cart')">加入购物车</div>
-      <div class="btn-buy" @click="showPopup('buy')">立刻购买</div>
     </div>
   </div>
 </template>
@@ -203,6 +262,11 @@ const showPopup = (mode) => {
   img {
     display: block;
     width: 100%;
+  }
+  .danmu {
+    width: 100%;
+    position: absolute;
+    z-index: 2;
   }
   .custom-indicator {
     position: absolute;
@@ -401,5 +465,21 @@ const showPopup = (mode) => {
   text-align: center;
   color: rgb(255, 255, 255);
   background-color: rgb(167, 167, 167);
+}
+.serviceContent {
+  display: flex;
+  width: 80%;
+  height: 200px;
+  flex-direction: column;
+  .serviceWords {
+    display: flex;
+
+    align-items: center; /* 垂直居中 */
+    margin: 10px;
+    font-size: 18px;
+    flex: 1;
+    color: #9a4b00; /* 调整字体颜色 */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* 添加文字阴影 */
+  }
 }
 </style>

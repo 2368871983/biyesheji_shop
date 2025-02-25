@@ -3,8 +3,10 @@ const onOffsetChange = (offset) => {
   // eslint-disable-next-line no-undef
   showToast(`x: ${offset.x.toFixed(0)}, y: ${offset.y.toFixed(0)}`)
 }
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const onClick = () => {
-  location.href = '/service'
+  router.push('/service')
 }
 </script>
 <template>

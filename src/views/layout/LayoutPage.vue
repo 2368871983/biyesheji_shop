@@ -1,6 +1,35 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { watch } from 'vue'
+const router = useRouter()
 const active = ref(0)
+const activeChange = () => {
+  switch (router.currentRoute.value.path) {
+    case '/home':
+      active.value = 0
+      break
+    case '/category':
+      active.value = 1
+      break
+    case '/cart':
+      active.value = 2
+      break
+    case '/user':
+      active.value = 3
+      break
+  }
+}
+onMounted(() => {
+  // 根据当前路由路径设置 active 的初始值
+  activeChange()
+})
+watch(
+  () => router.currentRoute.value.path,
+  () => {
+    activeChange()
+  },
+)
 </script>
 <template>
   <div>
