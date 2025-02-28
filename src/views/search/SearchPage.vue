@@ -1,5 +1,5 @@
 <script setup>
-const onClickLeft = () => router.push('/home')
+const onClickLeft = () => router.back()
 
 import { useSearchStore } from '@/stores'
 import { ref } from 'vue'

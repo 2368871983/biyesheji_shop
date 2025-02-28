@@ -23,6 +23,7 @@ import { NavBar } from 'vant';
 // 搜索框
 import { Search } from 'vant';
 // 宫格
+import { TreeSelect } from 'vant';
 import { Icon } from 'vant';
 import { GridItem } from 'vant';
 import { ImagePreview } from 'vant';
@@ -48,3 +49,4 @@ app.use(Rate);
 app.use(ActionSheet);
 app.use(Barrage);
 app.use(Icon);
+app.use(TreeSelect);
