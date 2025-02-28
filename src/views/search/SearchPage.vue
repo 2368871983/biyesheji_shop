@@ -1,5 +1,5 @@
 <script setup>
-const onClickLeft = () => history.back()
+const onClickLeft = () => router.push('/home')
 
 import { useSearchStore } from '@/stores'
 import { ref } from 'vue'
@@ -10,16 +10,17 @@ const onClickButton = () => {
     // eslint-disable-next-line no-undef
     showToast('请输入搜索关键词')
   } else {
-    if (searchList.value.length > 7) {
-      searchList.value.shift()
-    }
-
     searchList.value.unshift(inpValue.value)
-    inpValue.value = ''
+    goToSearhlist()
 
     searchList.value = new Array(...new Set(searchList.value))
 
+    if (searchList.value.length > 8) {
+      searchList.value.pop()
+    }
+
     searchStore.getItem(searchList.value)
+    inpValue.value = ''
   }
 }
 const delHistory = () => {
@@ -31,6 +32,17 @@ import { onMounted } from 'vue'
 onMounted(() => {
   searchList.value = searchStore.searchList
 })
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const goToSearhlist = (item) => {
+  router.push({
+    path: '/searchlist',
+    query: {
+      key: item || inpValue.value,
+    },
+  })
+}
 </script>
 
 <template>
@@ -53,7 +65,12 @@ onMounted(() => {
     <van-icon @click="delHistory()" name="delete-o" />
   </div>
   <div v-if="searchList.length > 0" class="searchHistory">
-    <div @click="$route.push(item)" v-for="(item, index) in searchList" :key="index" class="words">
+    <div
+      @click="goToSearhlist(item)"
+      v-for="(item, index) in searchList"
+      :key="index"
+      class="words"
+    >
       {{ item }}
     </div>
   </div>

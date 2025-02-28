@@ -9,8 +9,10 @@ export const useSearchStore = defineStore('search', () => {
   const removeItem = () => {
     searchList.value = []
   }
-
-  return { searchList, getItem, removeItem }
+  const getSearchList = () => {
+    return searchList.value
+  }
+  return { searchList, getItem, removeItem, getSearchList }
 },
   {
     persist: true,
