@@ -73,7 +73,7 @@ const priceRank = async () => {
   priceRanktag.value = priceRanktag.value === '0' ? '1' : '0'
   await loadSearchlist()
 }
-const onClickLeft = () => router.push('/search')
+const onClickLeft = () => router.back()
 </script>
 
 <template>

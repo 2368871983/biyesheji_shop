@@ -30,6 +30,13 @@ import { ImagePreview } from 'vant';
 import { Rate } from 'vant';
 import { ActionSheet } from 'vant';
 import { Barrage } from 'vant';
+import {
+  Skeleton,
+  SkeletonTitle,
+  SkeletonImage,
+  SkeletonAvatar,
+  SkeletonParagraph,
+} from 'vant';
 const app = createApp(App)
 app.use(pinia)
 app.use(router)
@@ -50,3 +57,8 @@ app.use(ActionSheet);
 app.use(Barrage);
 app.use(Icon);
 app.use(TreeSelect);
+app.use(Skeleton);
+app.use(SkeletonTitle);
+app.use(SkeletonImage);
+app.use(SkeletonAvatar);
+app.use(SkeletonParagraph);
