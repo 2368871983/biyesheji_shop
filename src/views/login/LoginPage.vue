@@ -13,7 +13,10 @@ const onRefresh = () => {
     location.reload()
   }, 1000)
 }
-
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const backUrl = route.query.backUrl
+console.log('接收到的 backUrl:', backUrl)
 // 表单数据
 const tel = ref('')
 const pic = ref('')
@@ -100,7 +103,18 @@ const getLogin = async () => {
 
   // eslint-disable-next-line no-undef
   showToast({ duration: 800, message: '登录成功！' })
-  router.push('/')
+  if (route.query && route.query.backUrl) {
+    const backUrl = route.query.backUrl
+    if (backUrl === 'notoken') {
+      router.back()
+      console.log(111111)
+    } else {
+      router.push(backUrl)
+    }
+  } else {
+    // 如果没有 backUrl，跳转到默认页面
+    router.push('/')
+  }
 }
 </script>
 

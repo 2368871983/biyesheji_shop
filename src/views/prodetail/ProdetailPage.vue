@@ -3,6 +3,7 @@ import { ref } from 'vue'
 const current = ref(0)
 const images = ref([])
 const onClickLeft = () => history.back()
+const goodsDataList = ref({})
 const goods_name = ref('')
 const goods_price_max = ref('')
 const goods_sales = ref('')
@@ -17,6 +18,11 @@ const defaultList = ref([])
 const barrage = ref()
 const danmulist = ref([...defaultList.value])
 const proserviceList = ref([])
+const total = ref(1)
+import { watch } from 'vue'
+watch(total, (newValue) => {
+  console.log(newValue)
+})
 // 轮播
 const onChange = (index) => {
   current.value = index
@@ -50,6 +56,11 @@ const loadData = async (id) => {
   const {
     data: { detail },
   } = await getProdetailData(id)
+  console.log({
+    data: { detail },
+  })
+  goodsDataList.value = detail
+  console.log(goodsDataList.value)
 
   images.value = detail.goods_images.map((item) => item.external_url)
   goods_name.value = detail.goods_name
@@ -76,10 +87,8 @@ const loadProComment = async (id) => {
       text: item.content.length > 10 ? item.content.slice(0, 10) + '...' : item.content,
     })),
   ]
-  console.log(defaultList.value)
 
   danmulist.value = [...defaultList.value]
-  console.log(list.value)
 
   score.value = list.map((item) => ({
     ...item,
@@ -90,7 +99,7 @@ const loadProComment = async (id) => {
 // 商品保障弹窗
 const loadProService = async (id) => {
   const { data } = await getProService(id)
-  console.log(data)
+
   proserviceList.value = data.list
 }
 const showService = ref(false)
@@ -104,6 +113,35 @@ const show = ref(false)
 const showPopup = (mode) => {
   show.value = true
   showmode.value = mode
+}
+
+// 计数组件
+import CountBox from '@/components/CountBox.vue'
+
+// 加入购物车
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+console.log(userStore.token)
+import router from '@/router'
+import { addCartData } from '@/api/cart'
+const addCart = async () => {
+  if (!userStore.token) {
+    router.push({
+      path: '/login',
+      query: {
+        backUrl: 'notoken',
+      },
+    })
+  }
+
+  const res = await addCartData({
+    goodsId: goodsDataList.value.goods_id,
+    goodsNum: total.value,
+    goodsSkuId: goodsDataList.value.skuList[0].goods_sku_id,
+  })
+  // eslint-disable-next-line no-undef
+  showToast({ duration: 800, message: '成功加入购物车！' })
+  console.log(res)
 }
 </script>
 <template>
@@ -203,7 +241,7 @@ const showPopup = (mode) => {
         <div class="content">
           <div class="product">
             <div class="left">
-              <img src="@/assets/categood.png" alt="" />
+              <img :src="goodsDataList.goods_image" alt="" />
             </div>
             <div class="right">
               <div class="price">
@@ -217,11 +255,11 @@ const showPopup = (mode) => {
           </div>
           <div class="count-box">
             <span>数量:</span>
-            组件占位
+            <CountBox v-model:total="total" />
           </div>
           <div class="btn">
             <div class="showbtn" v-if="stock > 0">
-              <div class="cartbtn" v-if="showmode == 'cart'">加入购物车</div>
+              <div @click="addCart" class="cartbtn" v-if="showmode == 'cart'">加入购物车</div>
               <div class="buybtn" v-if="showmode == 'buy'">立即购买</div>
             </div>
 
@@ -408,7 +446,10 @@ const showPopup = (mode) => {
 .product {
   display: flex;
   .left {
+    width: 150px;
+    height: 150px;
     padding: 10px;
+    margin-left: 20px;
     .img {
       width: 90px;
       height: 90px;
@@ -436,7 +477,7 @@ const showPopup = (mode) => {
 }
 .count-box {
   display: flex;
-  margin: 10px;
+  margin: 10px 10px 10px 20px;
   justify-content: space-between;
   align-items: center;
 }

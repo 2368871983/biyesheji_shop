@@ -7,5 +7,6 @@ pinia.use(persist)
 export default pinia
 
 export * from './modules/user'
-export * from './modules/active' 
-export * from './modules/search' 
+
+export * from './modules/search'
+export * from './modules/cart'

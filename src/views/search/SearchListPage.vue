@@ -28,7 +28,7 @@ const loadSearchlist = async () => {
   } = await getSearchlist({
     goodsName: querykey.value,
     sortPrice: priceRanktag.value,
-
+    categoryId: route.query.categoryId,
     page: 1,
   })
   console.log(data)

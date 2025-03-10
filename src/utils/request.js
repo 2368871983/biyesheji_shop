@@ -14,13 +14,12 @@ const instance = axios.create({
 instance.interceptors.request.use(
 
   (config) => {
-    const userStore = setTimeout(() => {
-      useUserStore()
-    }, 0)
+    const userStore = useUserStore()
+
     if (userStore.token) {
       config.headers['Access-Token'] = userStore.token
     }
-    config.headers['platform'] = 'H5'
+    config.headers.platform = 'H5'
     // eslint-disable-next-line no-undef
     showLoadingToast({
       message: '加载中...',

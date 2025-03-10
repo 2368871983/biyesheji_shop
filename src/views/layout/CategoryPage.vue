@@ -28,6 +28,7 @@ const getCategoryList = async () => {
   list.value = res.data.list
   children.value = res.data.list.map((item) => (children.value = item.children))
   console.log(children.value)
+  
 }
 </script>
 <template>
@@ -46,7 +47,7 @@ const getCategoryList = async () => {
         <div v-if="list[activeIndex]?.children && list[activeIndex].children.length > 0">
           <van-grid :border="false" :column-num="3">
             <van-grid-item
-              @click="$router.push(`/prodetail/${item.category_id}`)"
+              @click="$router.push(`/searchlist?categoryId=${item.category_id}`)"
               v-for="(item, index) in list[activeIndex]?.children"
               :key="index"
             >
