@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { defineEmits } from 'vue'
 
-const emits = defineEmits(['update:total'])
+const emits = defineEmits(['update:total', 'input'])
 const props = defineProps({
   total: {
     type: Number,
@@ -15,19 +15,22 @@ const handleSub = () => {
   if (total.value > 0) {
     total.value--
     emits('update:total', total.value)
+    emits('input', total.value)
   }
 }
 const handleAdd = () => {
   total.value++
   emits('update:total', total.value)
+  emits('input', total.value)
 }
 const handleChange = (e) => {
   const num = +e.target.value
   // 输入了不合法的文本 或 输入了负值，回退成原来的 value 值
   if (isNaN(num) || num < 1) {
-    e.target.value = 0
-    total.value = 0
+    e.target.value = 1
+    total.value = 1
     emits('update:total', total.value)
+    emits('input', total.value)
     return
   }
 }

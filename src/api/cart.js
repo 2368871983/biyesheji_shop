@@ -33,3 +33,14 @@ export const getCartData = () => {
     method: 'GET',
   })
 }
+
+
+export const delCartData = (array) => {
+  return request({
+    url: '/cart/clear',
+    method: 'POST',
+    params: {
+      cartIds: array,
+    }
+  })
+}

@@ -19,6 +19,8 @@ const barrage = ref()
 const danmulist = ref([...defaultList.value])
 const proserviceList = ref([])
 const total = ref(1)
+const totalCount = ref(0)
+const cartList = ref([])
 import { watch } from 'vue'
 watch(total, (newValue) => {
   console.log(newValue)
@@ -50,17 +52,15 @@ onMounted(async () => {
   await loadData(goodsId.value)
   await loadProComment(goodsId.value)
   await loadProService(goodsId.value)
+  updateIcon()
 })
 // 商品数据
 const loadData = async (id) => {
   const {
     data: { detail },
   } = await getProdetailData(id)
-  console.log({
-    data: { detail },
-  })
+
   goodsDataList.value = detail
-  console.log(goodsDataList.value)
 
   images.value = detail.goods_images.map((item) => item.external_url)
   goods_name.value = detail.goods_name
@@ -118,12 +118,11 @@ const showPopup = (mode) => {
 // 计数组件
 import CountBox from '@/components/CountBox.vue'
 
-// 加入购物车
-import { useUserStore } from '@/stores'
+import { useCartStore, useUserStore } from '@/stores'
 const userStore = useUserStore()
-console.log(userStore.token)
+
 import router from '@/router'
-import { addCartData } from '@/api/cart'
+import { addCartData, getCartData } from '@/api/cart'
 const addCart = async () => {
   if (!userStore.token) {
     router.push({
@@ -133,15 +132,39 @@ const addCart = async () => {
       },
     })
   }
-
-  const res = await addCartData({
+  // 加入购物车
+  if (total.value <= 0) return
+  await addCartData({
     goodsId: goodsDataList.value.goods_id,
     goodsNum: total.value,
     goodsSkuId: goodsDataList.value.skuList[0].goods_sku_id,
   })
   // eslint-disable-next-line no-undef
   showToast({ duration: 800, message: '成功加入购物车！' })
-  console.log(res)
+  const {
+    data: { list },
+  } = await getCartData()
+
+  useCartStore().setCartList(list)
+  cartList.value = useCartStore().cartList
+
+  totalCount.value = cartList.value.reduce((pre, item) => {
+    return pre + item.goods_num
+  }, 0)
+
+  updateIcon()
+  show.value = false
+  console.log(total.value)
+
+  total.value = 1
+}
+
+const updateIcon = async () => {
+  const cartStore = useCartStore()
+  cartList.value = cartStore.cartList
+  totalCount.value = cartList.value.reduce((pre, item) => {
+    return pre + item.goods_num
+  }, 0)
 }
 </script>
 <template>
@@ -277,7 +300,8 @@ const addCart = async () => {
         </div>
         <div class="icon-cart">
           <van-icon name="shopping-cart-o" />
-          <span @click="$router.push('/cart')">购物车</span>
+          <span v-if="totalCount > 0" class="iconnum">{{ totalCount }}</span>
+          <span @click="$router.push('/cart')"> 购物车 </span>
         </div>
         <div class="btn-add" @click="showPopup('cart')">加入购物车</div>
         <div class="btn-buy" @click="showPopup('buy')">立刻购买</div>
@@ -419,6 +443,18 @@ const addCart = async () => {
       align-items: center;
       justify-content: center;
       font-size: 14px;
+      .iconnum {
+        z-index: 999;
+        position: absolute;
+        top: 0.46667vw;
+        right: 280px;
+        min-width: 16px;
+        padding: 0 4px;
+        color: #fff;
+        text-align: center;
+        background-color: #ee0a24;
+        border-radius: 50%;
+      }
       .van-icon {
         font-size: 24px;
       }
