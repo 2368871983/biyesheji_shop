@@ -200,7 +200,7 @@ const updateCart = async (goodsId, goodsNum, goodsSkuId) => {
     padding: 10px;
     display: flex;
     justify-content: space-between;
-    background-color: #ffffff;
+    background-color: #f5f5f5;
     border-radius: 5px;
 
     .show img {

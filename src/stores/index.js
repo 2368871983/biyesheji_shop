@@ -10,3 +10,4 @@ export * from './modules/user'
 
 export * from './modules/search'
 export * from './modules/cart'
+export * from './modules/address'

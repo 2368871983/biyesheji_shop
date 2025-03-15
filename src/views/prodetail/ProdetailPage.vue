@@ -139,8 +139,7 @@ const addCart = async () => {
     goodsNum: total.value,
     goodsSkuId: goodsDataList.value.skuList[0].goods_sku_id,
   })
-  // eslint-disable-next-line no-undef
-  showToast({ duration: 800, message: '成功加入购物车！' })
+
   const {
     data: { list },
   } = await getCartData()
@@ -154,9 +153,10 @@ const addCart = async () => {
 
   updateIcon()
   show.value = false
-  console.log(total.value)
 
   total.value = 1
+  // eslint-disable-next-line no-undef
+  showToast({ duration: 800, message: '成功加入购物车！' })
 }
 
 const updateIcon = async () => {

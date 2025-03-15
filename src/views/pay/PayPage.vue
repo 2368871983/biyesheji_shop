@@ -1,9 +1,22 @@
+<script setup>
+import { getAddressList } from '@/api/address'
+import router from '@/router'
+const getAddress = async () => {
+  const res = await getAddressList()
+  console.log(res)
+}
+import { onMounted } from 'vue'
+onMounted(() => {
+  getAddress()
+})
+</script>
+
 <template>
   <div class="pay">
     <van-nav-bar fixed title="订单结算台" left-arrow @click-left="$router.go(-1)" />
 
     <!-- 地址相关 -->
-    <div class="address">
+    <div class="address" @click="router.push('/address')">
       <div class="left-icon">
         <van-icon name="logistics" />
       </div>
@@ -99,17 +112,15 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'PayIndex',
-  data() {
-    return {}
-  },
-  methods: {},
-}
-</script>
-
 <style lang="less" scoped>
+.van-nav-bar {
+  background: linear-gradient(180deg, #fcd6d3, #fff3f3);
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
 .pay {
   padding-top: 46px;
   padding-bottom: 46px;

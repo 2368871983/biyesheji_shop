@@ -30,6 +30,8 @@ import { ImagePreview } from 'vant';
 import { Rate } from 'vant';
 import { ActionSheet } from 'vant';
 import { Barrage } from 'vant';
+import { Area } from 'vant';
+import { AddressEdit } from 'vant';
 import {
   Skeleton,
   SkeletonTitle,
@@ -37,6 +39,8 @@ import {
   SkeletonAvatar,
   SkeletonParagraph,
 } from 'vant';
+import { AddressList } from 'vant';
+
 const app = createApp(App)
 app.use(pinia)
 app.use(router)
@@ -62,3 +66,6 @@ app.use(SkeletonTitle);
 app.use(SkeletonImage);
 app.use(SkeletonAvatar);
 app.use(SkeletonParagraph);
+app.use(AddressList)
+app.use(AddressEdit);
+app.use(Area);

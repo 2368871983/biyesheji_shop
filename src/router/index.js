@@ -34,6 +34,8 @@ const router = createRouter({
     { path: '/searchlist', component: () => import('@/views/search/SearchListPage.vue') },
     { path: '/service', component: () => import('@/views/service/ServicePage.vue') },
     { path: '/login', component: () => import('@/views/login/LoginPage.vue') },
+    { path: '/address', component: () => import('@/views/address/AddressPage.vue') },
+    { path: '/addaddress', component: () => import('@/views/address/AddAddressPage.vue') },
   ]
 })
 
