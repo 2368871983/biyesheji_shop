@@ -13,7 +13,7 @@ const cartList = ref([])
 const totalCount = ref(0)
 const totalPrice = ref(0)
 const cartStore = useCartStore()
-
+const checkedIds = ref([])
 const isAllChecked = ref(true)
 const getCartList = async () => {
   const {
@@ -26,7 +26,11 @@ const getCartList = async () => {
 
   cartStore.setCartList(list)
   cartList.value = cartStore.cartList
-
+  checkedIds.value = cartList.value.map((item) => {
+    if (item.isChecked) {
+      return item.id
+    }
+  })
   totalCount.value = cartList.value.reduce((pre, item) => {
     return pre + item.goods_num
   }, 0)
@@ -69,13 +73,13 @@ const handleEdit = () => {
 import { delCartData } from '@/api/cart'
 const delCart = async () => {
   if (totalCount.value === 0) return
-  const checkedIds = cartList.value.map((item) => {
+  checkedIds.value = cartList.value.map((item) => {
     if (item.isChecked) {
       return item.id
     }
   })
 
-  await delCartData(checkedIds)
+  await delCartData(checkedIds.value)
   getCartList()
 }
 
@@ -84,6 +88,30 @@ const updateCart = async (goodsId, goodsNum, goodsSkuId) => {
   const res = await updateCartData({ goodsId, goodsNum, goodsSkuId })
   getCartList()
   console.log(res)
+}
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const goPay = () => {
+  const checkedItems = cartList.value.filter((item) => item.isChecked)
+  if (checkedItems.length === 0) {
+    // eslint-disable-next-line no-undef
+    showToast('请先选择商品!')
+    return
+  }
+
+  console.log(checkedIds.value.join(','))
+  checkedIds.value = cartList.value.map((item) => {
+    if (item.isChecked) {
+      return item.id
+    }
+  })
+  router.push({
+    path: '/pay',
+    query: {
+      mode: 'cart',
+      cartIds: checkedIds.value.join(','),
+    },
+  })
 }
 </script>
 
@@ -148,7 +176,7 @@ const updateCart = async (goodsId, goodsNum, goodsSkuId) => {
               >¥ <i class="totalPrice"> {{ totalPrice }}</i></span
             >
           </div>
-          <div v-if="isEdit === false" class="goPay">结算({{ totalCount }})</div>
+          <div @click="goPay" v-if="isEdit === false" class="goPay">结算({{ totalCount }})</div>
           <div v-else @click="delCart" class="delete">删除({{ totalCount }})</div>
         </div>
       </div>

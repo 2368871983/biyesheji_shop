@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export const useAddressStore = defineStore('big-active', () => {
+export const useAddressStore = defineStore('address', () => {
 
   const address = ref({})
   const setAddress = (data) => {
@@ -12,7 +12,8 @@ export const useAddressStore = defineStore('big-active', () => {
     chosenAddressId.value = id
   }
 
-  return { address, setAddress, setChosenAddressId, chosenAddressId }
+
+  return { address, setAddress, setChosenAddressId, chosenAddressId, }
 },
   {
     persist: true,

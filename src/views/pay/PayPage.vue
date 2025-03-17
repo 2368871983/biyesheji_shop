@@ -1,19 +1,51 @@
 <script setup>
 import { getAddressList } from '@/api/address'
+
+import { getBuyNowPay, getCartPay } from '@/api/pay'
 import router from '@/router'
+import { useAddressStore } from '@/stores'
+import { ref } from 'vue'
+const goodsList = ref([])
+const address = ref({})
 const getAddress = async () => {
-  const res = await getAddressList()
-  console.log(res)
+  await getAddressList()
+
+  const addressStore = useAddressStore()
+  address.value = addressStore.address
+  console.log(addressStore.address)
 }
+const order = ref({})
 import { onMounted } from 'vue'
-onMounted(() => {
-  getAddress()
+onMounted(async () => {
+  await getAddress()
+
+  const cartIds = router.currentRoute.value.query.cartIds
+
+  const goodsId = router.currentRoute.value.query.goodsId
+  const goodsNum = router.currentRoute.value.query.goodsNum
+  const goodsSkuId = router.currentRoute.value.query.goodsSkuId
+
+  const mode = router.currentRoute.value.query.mode
+  console.log(mode)
+
+  if (mode === 'buyNow') {
+    const res = await getBuyNowPay(mode, goodsId, goodsNum, goodsSkuId)
+    console.log(res)
+    goodsList.value = res.data.order.goodsList
+    console.log(goodsList.value)
+    order.value = res.data.order
+  } else if (mode === 'cart') {
+    const res = await getCartPay(mode, cartIds)
+    console.log(res)
+    goodsList.value = res.data.order.goodsList
+    order.value = res.data.order
+  }
 })
 </script>
 
 <template>
   <div class="pay">
-    <van-nav-bar fixed title="订单结算台" left-arrow @click-left="$router.go(-1)" />
+    <van-nav-bar fixed title="订单结算台" left-arrow @click-left="$router.back()" />
 
     <!-- 地址相关 -->
     <div class="address" @click="router.push('/address')">
@@ -21,12 +53,14 @@ onMounted(() => {
         <van-icon name="logistics" />
       </div>
 
-      <div class="info" v-if="true">
+      <div class="info" v-if="Object.keys(address).length > 0">
         <div class="info-content">
-          <span class="name">小红</span>
-          <span class="mobile">13811112222</span>
+          <span style="margin-right: 10px" class="name">{{ address.name }}</span>
+          <span class="mobile">{{ address.tel }}</span>
         </div>
-        <div class="info-address">江苏省 无锡市 南长街 110号 504</div>
+        <div class="info-address">
+          {{ address.province }} {{ address.city }} {{ address.county }} {{ address.addressDetail }}
+        </div>
       </div>
 
       <div class="info" v-else>请选择配送地址</div>
@@ -39,35 +73,31 @@ onMounted(() => {
     <!-- 订单明细 -->
     <div class="pay-list">
       <div class="list">
-        <div class="goods-item">
+        <div class="goods-item" v-for="item in goodsList" :key="item.goods_id">
           <div class="left">
-            <img
-              src="http://cba.itlike.com/public/uploads/10001/20230321/8f505c6c437fc3d4b4310b57b1567544.jpg"
-              alt=""
-            />
+            <img :src="item.goods_image" alt="" />
           </div>
           <div class="right">
             <p class="tit text-ellipsis-2">
-              三星手机 SAMSUNG Galaxy S23 8GB+256GB 超视觉夜拍系统 超清夜景 悠雾紫 5G手机
-              游戏拍照旗舰机s23
+              {{ item.goods_name }}
             </p>
             <p class="info">
-              <span class="count">x3</span>
-              <span class="price">¥9.99</span>
+              <span class="count">x{{ item.total_num }}</span>
+              <span class="price">¥{{ item.goods_price }}</span>
             </p>
           </div>
         </div>
       </div>
 
       <div class="flow-num-box">
-        <span>共 12 件商品，合计：</span>
-        <span class="money">￥1219.00</span>
+        <span>共 {{ order.orderTotalNum }} 件商品，合计：</span>
+        <span class="money">￥{{ order.orderTotalPrice }}</span>
       </div>
 
       <div class="pay-detail">
         <div class="pay-cell">
           <span>订单总金额：</span>
-          <span class="red">￥1219.00</span>
+          <span class="red">￥{{ order.orderTotalPrice }}</span>
         </div>
 
         <div class="pay-cell">
@@ -92,7 +122,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- 买家留言 -->
+      <!-- 买家留言
       <div class="buytips">
         <textarea
           placeholder="选填：买家留言（50字内）"
@@ -101,7 +131,7 @@ onMounted(() => {
           cols="30"
           rows="10"
         ></textarea>
-      </div>
+      </div> -->
     </div>
 
     <!-- 底部提交 -->
@@ -178,6 +208,7 @@ onMounted(() => {
       margin-top: 5px;
       display: flex;
       justify-content: space-between;
+
       .price {
         color: #fa2209;
       }

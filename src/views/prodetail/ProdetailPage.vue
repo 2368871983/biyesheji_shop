@@ -95,7 +95,7 @@ const loadProComment = async (id) => {
     score: item.score / 2,
   }))
 }
-
+const countBoxRef = ref(null)
 // 商品保障弹窗
 const loadProService = async (id) => {
   const { data } = await getProService(id)
@@ -152,9 +152,9 @@ const addCart = async () => {
   }, 0)
 
   updateIcon()
+
   show.value = false
 
-  total.value = 1
   // eslint-disable-next-line no-undef
   showToast({ duration: 800, message: '成功加入购物车！' })
 }
@@ -165,6 +165,18 @@ const updateIcon = async () => {
   totalCount.value = cartList.value.reduce((pre, item) => {
     return pre + item.goods_num
   }, 0)
+}
+
+const goPay = () => {
+  router.push({
+    path: '/pay',
+    query: {
+      mode: 'buyNow',
+      goodsId: goodsDataList.value.goods_id,
+      goodsNum: total.value,
+      goodsSkuId: 0,
+    },
+  })
 }
 </script>
 <template>
@@ -278,12 +290,12 @@ const updateIcon = async () => {
           </div>
           <div class="count-box">
             <span>数量:</span>
-            <CountBox v-model:total="total" />
+            <CountBox ref="countBoxRef" v-model:total="total" />
           </div>
           <div class="btn">
             <div class="showbtn" v-if="stock > 0">
               <div @click="addCart" class="cartbtn" v-if="showmode == 'cart'">加入购物车</div>
-              <div class="buybtn" v-if="showmode == 'buy'">立即购买</div>
+              <div @click="goPay" class="buybtn" v-if="showmode == 'buy'">立即购买</div>
             </div>
 
             <div class="hidebtn" v-else>

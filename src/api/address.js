@@ -50,11 +50,12 @@ export const deleteAddressList = (id) => {
   });
 }
 
-export const updateAddressList = (name, phone, provinceCode, province, cityCode, city, countyCode, county, detail) => {
+export const updateAddressList = (id, name, phone, provinceCode, province, cityCode, city, countyCode, county, detail) => {
   return request({
-    url: '/address/detail',
+    url: '/address/edit',
     method: 'POST',
     data: {
+      addressId: id,
       form: {
         name,
         phone,
@@ -72,6 +73,16 @@ export const getAddressDetail = (id) => {
   return request({
     url: '/address/detail',
     method: 'GET',
+    params: {
+      addressId: id
+    }
+  });
+}
+
+export const setAddress = (id) => {
+  return request({
+    url: '/address/setDefault',
+    method: 'POST',
     params: {
       addressId: id
     }
