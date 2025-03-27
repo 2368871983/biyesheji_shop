@@ -1,12 +1,18 @@
 <script setup>
 import { getAddressList } from '@/api/address'
 
-import { getBuyNowPay, getCartPay } from '@/api/pay'
+import { getBuyNowPay, getCartPay, submitBuyNowPay, submitCartPay } from '@/api/pay'
 import router from '@/router'
 import { useAddressStore } from '@/stores'
+
 import { ref } from 'vue'
 const goodsList = ref([])
 const address = ref({})
+const cartIds = ref('')
+const goodsId = ref('')
+const goodsNum = ref('')
+const goodsSkuId = ref('')
+const mode = ref('')
 const getAddress = async () => {
   await getAddressList()
 
@@ -19,28 +25,45 @@ import { onMounted } from 'vue'
 onMounted(async () => {
   await getAddress()
 
-  const cartIds = router.currentRoute.value.query.cartIds
+  cartIds.value = router.currentRoute.value.query.cartIds
 
-  const goodsId = router.currentRoute.value.query.goodsId
-  const goodsNum = router.currentRoute.value.query.goodsNum
-  const goodsSkuId = router.currentRoute.value.query.goodsSkuId
+  goodsId.value = router.currentRoute.value.query.goodsId
+  goodsNum.value = router.currentRoute.value.query.goodsNum
+  goodsSkuId.value = router.currentRoute.value.query.goodsSkuId
 
-  const mode = router.currentRoute.value.query.mode
+  mode.value = router.currentRoute.value.query.mode
   console.log(mode)
 
-  if (mode === 'buyNow') {
-    const res = await getBuyNowPay(mode, goodsId, goodsNum, goodsSkuId)
+  if (mode.value === 'buyNow') {
+    const res = await getBuyNowPay(mode.value, goodsId.value, goodsNum.value, goodsSkuId.value)
     console.log(res)
     goodsList.value = res.data.order.goodsList
     console.log(goodsList.value)
     order.value = res.data.order
-  } else if (mode === 'cart') {
-    const res = await getCartPay(mode, cartIds)
+  } else if (mode.value === 'cart') {
+    const res = await getCartPay(mode.value, cartIds.value)
     console.log(res)
     goodsList.value = res.data.order.goodsList
     order.value = res.data.order
   }
 })
+// 订单结算
+const submitOrder = async () => {
+  if (mode.value === 'buyNow') {
+    const res = await submitBuyNowPay(mode.value, goodsId.value, goodsNum.value)
+
+    console.log(res)
+  } else if (mode.value === 'cart') {
+    const res = await submitCartPay(mode.value, cartIds.value)
+    console.log(res)
+  }
+
+  // eslint-disable-next-line no-undef
+  showToast({ message: '交易成功！' })
+  setTimeout(() => {
+    router.push('/myorder')
+  }, 1000)
+}
 </script>
 
 <template>
@@ -136,8 +159,10 @@ onMounted(async () => {
 
     <!-- 底部提交 -->
     <div class="footer-fixed">
-      <div class="left">实付款：<span>￥999919</span></div>
-      <div class="tipsbtn">提交订单</div>
+      <div class="left">
+        实付款：<span>￥{{ order.orderTotalPrice }}</span>
+      </div>
+      <div @click="submitOrder" class="tipsbtn">提交订单</div>
     </div>
   </div>
 </template>

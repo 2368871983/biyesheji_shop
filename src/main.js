@@ -39,9 +39,12 @@ import {
   SkeletonAvatar,
   SkeletonParagraph,
 } from 'vant';
+import { Tab, Tabs } from 'vant';
 import { AddressList } from 'vant';
 
 const app = createApp(App)
+app.use(Tab)
+app.use(Tabs)
 app.use(pinia)
 app.use(router)
 app.mount('#app')

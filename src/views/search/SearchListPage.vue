@@ -6,6 +6,8 @@ const searchList = ref([])
 const querykey = ref('')
 const historyList = ref([])
 const priceRanktag = ref('0')
+// 新增销量排序标签
+const salesRanktag = ref('0')
 import { useSearchStore } from '@/stores'
 const searchStore = useSearchStore()
 historyList.value = searchStore.getSearchList()
@@ -27,13 +29,12 @@ const loadSearchlist = async () => {
     },
   } = await getSearchlist({
     goodsName: querykey.value,
-    sortPrice: priceRanktag.value,
     categoryId: route.query.categoryId,
     page: 1,
   })
   console.log(data)
   searchList.value = data
-  if (data.length == 0) {
+  if (data.length === 0) {
     // eslint-disable-next-line no-undef
     showToast('暂无商品数据')
   }
@@ -47,7 +48,7 @@ const goToSearhlist = async () => {
       key: inpValue.value,
     },
   })
-  if (inpValue.value == '') {
+  if (inpValue.value === '') {
     // eslint-disable-next-line no-undef
     showToast('请输入搜索关键词')
     return
@@ -67,12 +68,31 @@ const goToSearhlist = async () => {
     inpValue.value = ''
   }
 }
-// 价格排序
 
-const priceRank = async () => {
+// 价格排序
+const priceRank = () => {
   priceRanktag.value = priceRanktag.value === '0' ? '1' : '0'
-  await loadSearchlist()
+  // 当进行价格排序时，重置销量排序
+  salesRanktag.value = '0'
+  searchList.value.sort((a, b) => {
+    const priceA = parseFloat(a.goods_price_min)
+    const priceB = parseFloat(b.goods_price_min)
+    return priceRanktag.value === '0' ? priceA - priceB : priceB - priceA
+  })
 }
+
+// 销量排序
+const salesRank = () => {
+  salesRanktag.value = salesRanktag.value === '0' ? '1' : '0'
+  // 当进行销量排序时，重置价格排序
+  priceRanktag.value = '0'
+  searchList.value.sort((a, b) => {
+    const salesA = a.goods_sales
+    const salesB = b.goods_sales
+    return salesRanktag.value === '0' ? salesA - salesB : salesB - salesA
+  })
+}
+
 const onClickLeft = () => router.back()
 </script>
 
@@ -94,10 +114,15 @@ const onClickLeft = () => router.back()
   </div>
   <div class="choose">
     <div class="tag">综合</div>
-    <div class="tag">销量</div>
     <div class="tag">
-      售价<van-icon @click="priceRank" v-if="priceRanktag == '0'" name="ascending" />
-      <van-icon @click="priceRank" v-if="priceRanktag == '1'" name="descending" />
+      销量
+      <van-icon @click="salesRank" v-if="salesRanktag === '0'" name="ascending" />
+      <van-icon @click="salesRank" v-if="salesRanktag === '1'" name="descending" />
+    </div>
+    <div class="tag">
+      售价
+      <van-icon @click="priceRank" v-if="priceRanktag === '0'" name="ascending" />
+      <van-icon @click="priceRank" v-if="priceRanktag === '1'" name="descending" />
     </div>
   </div>
   <div class="goods-list">

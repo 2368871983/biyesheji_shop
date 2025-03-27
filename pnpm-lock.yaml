@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@vant/area-data':
+        specifier: ^2.0.0
+        version: 2.0.0
       axios:
         specifier: ^1.7.9
         version: 1.7.9
@@ -598,6 +601,9 @@ packages:
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
+  '@vant/area-data@2.0.0':
+    resolution: {integrity: sha512-zgP4AA8z09S9QTNgVCCHo9cHjcybrv22RJDYPjuCkecn4SB98T5EoPQh2TwqbQXmUhbaOGgiZGy3OUaUxnY7qg==}
 
   '@vant/auto-import-resolver@1.2.1':
     resolution: {integrity: sha512-czGWW4UolNITkF3qQSQlpHDHAsI3/GHVKbRMmEEpry7NWdnU4p5a5jBi0VApbaLa5g80Hy10XVs3IB+UozoSUw==}
@@ -2647,6 +2653,8 @@ snapshots:
   '@types/estree@1.0.6': {}
 
   '@types/json-schema@7.0.15': {}
+
+  '@vant/area-data@2.0.0': {}
 
   '@vant/auto-import-resolver@1.2.1': {}
 

@@ -36,6 +36,7 @@ const router = createRouter({
     { path: '/login', component: () => import('@/views/login/LoginPage.vue') },
     { path: '/address', component: () => import('@/views/address/AddressPage.vue') },
     { path: '/addaddress', component: () => import('@/views/address/AddAddressPage.vue') },
+
   ]
 })
 

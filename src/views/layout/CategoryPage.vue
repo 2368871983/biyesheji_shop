@@ -28,7 +28,6 @@ const getCategoryList = async () => {
   list.value = res.data.list
   children.value = res.data.list.map((item) => (children.value = item.children))
   console.log(children.value)
-  
 }
 </script>
 <template>
